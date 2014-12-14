@@ -41,6 +41,11 @@
       yum: name=git state=latest
     - name: install composer
       shell: curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer creates=/usr/local/bin/composer
+    - name: install node.js, npm
+      yum: name={{item}} enablerepo=epel state=present
+      with_items:
+        - nodejs
+        - npm
   handlers:
     - name: restart apache
       service: name=httpd state=restarted
