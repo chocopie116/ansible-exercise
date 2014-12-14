@@ -3,7 +3,7 @@
   sudo: yes
   tasks:
     - name: add a new user
-      user: name=chocopie116
+      user: name=guest
     - name: install libselinux-python
       yum: name=libselinux-python state=latest
 
