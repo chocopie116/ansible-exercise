@@ -31,6 +31,8 @@
       copy: src=./hello.php dest=/var/www/html/hello.php owner=vagrant
     - name: install git
       yum: name=git state=latest
+    - name: install composer
+      shell: curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer creates=/usr/local/bin/composer
   handlers:
     - name: restart apache
       service: name=httpd state=restarted
