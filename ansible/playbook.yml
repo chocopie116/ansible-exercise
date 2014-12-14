@@ -6,6 +6,12 @@
       user: name=guest
     - name: install libselinux-python
       yum: name=libselinux-python state=latest
+    - name: add repository 'rpmforge-repo'
+      yum: name=http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm state=present
+    - name: add repository 'remi-repo'
+      yum: name=http://rpms.famillecollet.com/enterprise/remi-release-6.rpm state=present
+    - name: add repository 'remi-epel'
+      yum: name=http://dl.iuscommunity.org/pub/ius/stable/Redhat/6/x86_64/epel-release-6-5.noarch.rpm state=present
 
 - hosts: web
   sudo: yes
@@ -19,12 +25,14 @@
     - name: copy index.html
       copy: src=./index.html dest=/var/www/html/index.html
     - name: install php packages
-      yum: name={{item}} state=latest
+      yum: name={{item}} enablerepo=remi,epel,rpmforge state=present
       with_items:
         - php
         - php-devel
-        - php-mbstring
         - php-mysql
+        - php-mcrypt
+        - php-mbstring
+        - php-xml
       notify:
         - restart apache
     - name: copy hello.php
