@@ -6,6 +6,12 @@
       user: name=guest
     - name: install libselinux-python
       yum: name=libselinux-python state=latest
+    - name: add repository 'rpmforge-repo'
+      yum: name=http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm state=present
+    - name: add repository 'remi-repo'
+      yum: name=http://rpms.famillecollet.com/enterprise/remi-release-6.rpm state=present
+    - name: add repository 'remi-epel'
+      yum: name=http://dl.iuscommunity.org/pub/ius/stable/Redhat/6/x86_64/epel-release-6-5.noarch.rpm state=present
 
 - hosts: web
   sudo: yes
@@ -17,18 +23,29 @@
     - name: change owner
       file: dest=/var/www/html owner=vagrant recurse=yes
     - name: copy index.html
-      copy: src=./index.html dest=/var/www/html/index.html 
+      copy: src=./index.html dest=/var/www/html/index.html
     - name: install php packages
-      yum: name={{item}} state=latest
+      yum: name={{item}} enablerepo=remi,epel,rpmforge state=present
       with_items:
         - php
         - php-devel
-        - php-mbstring
         - php-mysql
+        - php-mcrypt
+        - php-mbstring
+        - php-xml
       notify:
         - restart apache
     - name: copy hello.php
       copy: src=./hello.php dest=/var/www/html/hello.php owner=vagrant
+    - name: install git
+      yum: name=git state=latest
+    - name: install composer
+      shell: curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer creates=/usr/local/bin/composer
+    - name: install node.js, npm
+      yum: name={{item}} enablerepo=epel state=present
+      with_items:
+        - nodejs
+        - npm
   handlers:
     - name: restart apache
       service: name=httpd state=restarted
